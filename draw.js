@@ -1,29 +1,36 @@
+doWork();
 
-let graph = new Graph();
+async function doWork() {
+    let graph = new Graph();
 
-graph.buildGraph(10,10);
+    graph.buildGraph(10,10);
+    
+    draw(graph);
+    
+    await dfs(graph, graph.startVertex);
+    
+}
 
-draw(graph)
+async function draw(graph) {
+    let vertices = graph.vertices;
 
-function draw(graph) {
     var marginTop = 30,
     marginLeft = 30,
     fieldSize = 40,
-    boardSize = 100*fieldSize;
+    totalSize = vertices.length * vertices[0].length;
+    boardSize = totalSize*fieldSize;
 
     var board =[];
 
-    let vertices = graph.vertices;
     for (let row = 0; row < vertices.length; row++) {
         
-        for (let column = 0; column < vertices.length; column++) {
+        for (let column = 0; column < vertices[0].length; column++) {
             board.push({
                 x: row,
                 y: column,
                 vertex: vertices[row][column]});
         }
     }
-
 
     var div = d3.select("body")
     .append("div")
@@ -45,7 +52,6 @@ function draw(graph) {
     .style("class", "fields")
     .style("class", "rects")
     .attr("x", function (d) {
-        console.log("hello:", d);
         return d.x*fieldSize;
     })
     .attr("y", function (d) {
@@ -56,9 +62,13 @@ function draw(graph) {
     .attr("stroke-width", "3")
     .attr("stroke", "rgb(0,0,0)")
     .style("fill",  function (d) {
-        if(d.vertex.isStartNode)
+        if(d.vertex.isCurrent)
+            return "pink"
+        if(d.vertex.isStartVertex)
             return "green"
-        if(d.vertex.isEndNode)
+        if(d.vertex.visited)
+            return "blue"
+        if(d.vertex.isEndVertex)
             return "red"
         return "white";
     });
